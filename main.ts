@@ -524,7 +524,7 @@ class MdToAnkiSettingTab extends PluginSettingTab {
             .setName('输出文件路径')
             .setDesc('生成的Anki文件保存路径。支持：\n• 相对路径（在当前库内）：如 "Anki Cards"\n• 绝对路径（下载到系统目录）：如 "/Users/用户名/Downloads"\n• 留空则保存在当前文件同目录')
             .addText(text => text
-                .setPlaceholder('例如: /Users/jz/Downloads 或 Anki Cards')
+                .setPlaceholder('例如: /Users/xx/Downloads 或 Anki Cards')
                 .setValue(this.plugin.settings.outputPath)
                 .onChange(async (value) => {
                     this.plugin.settings.outputPath = value;

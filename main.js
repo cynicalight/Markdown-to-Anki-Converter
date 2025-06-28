@@ -402,7 +402,7 @@ var MdToAnkiSettingTab = class extends import_obsidian.PluginSettingTab {
       this.plugin.settings.deepseekApiKey = value;
       await this.plugin.saveSettings();
     }));
-    new import_obsidian.Setting(containerEl).setName("\u8F93\u51FA\u6587\u4EF6\u8DEF\u5F84").setDesc('\u751F\u6210\u7684Anki\u6587\u4EF6\u4FDD\u5B58\u8DEF\u5F84\u3002\u652F\u6301\uFF1A\n\u2022 \u76F8\u5BF9\u8DEF\u5F84\uFF08\u5728\u5F53\u524D\u5E93\u5185\uFF09\uFF1A\u5982 "Anki Cards"\n\u2022 \u7EDD\u5BF9\u8DEF\u5F84\uFF08\u4E0B\u8F7D\u5230\u7CFB\u7EDF\u76EE\u5F55\uFF09\uFF1A\u5982 "/Users/\u7528\u6237\u540D/Downloads"\n\u2022 \u7559\u7A7A\u5219\u4FDD\u5B58\u5728\u5F53\u524D\u6587\u4EF6\u540C\u76EE\u5F55').addText((text) => text.setPlaceholder("\u4F8B\u5982: /Users/jz/Downloads \u6216 Anki Cards").setValue(this.plugin.settings.outputPath).onChange(async (value) => {
+    new import_obsidian.Setting(containerEl).setName("\u8F93\u51FA\u6587\u4EF6\u8DEF\u5F84").setDesc('\u751F\u6210\u7684Anki\u6587\u4EF6\u4FDD\u5B58\u8DEF\u5F84\u3002\u652F\u6301\uFF1A\n\u2022 \u76F8\u5BF9\u8DEF\u5F84\uFF08\u5728\u5F53\u524D\u5E93\u5185\uFF09\uFF1A\u5982 "Anki Cards"\n\u2022 \u7EDD\u5BF9\u8DEF\u5F84\uFF08\u4E0B\u8F7D\u5230\u7CFB\u7EDF\u76EE\u5F55\uFF09\uFF1A\u5982 "/Users/\u7528\u6237\u540D/Downloads"\n\u2022 \u7559\u7A7A\u5219\u4FDD\u5B58\u5728\u5F53\u524D\u6587\u4EF6\u540C\u76EE\u5F55').addText((text) => text.setPlaceholder("\u4F8B\u5982: /Users/xx/Downloads \u6216 Anki Cards").setValue(this.plugin.settings.outputPath).onChange(async (value) => {
       this.plugin.settings.outputPath = value;
       await this.plugin.saveSettings();
     }));
