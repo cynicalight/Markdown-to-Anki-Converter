@@ -41,46 +41,64 @@ var DeepSeekAPI = class {
     this.apiKey = apiKey;
   }
   async translateWord(word, context) {
-    const prompt = `\u8BF7\u7FFB\u8BD1\u82F1\u6587\u5355\u8BCD"${word}"\u5728\u4EE5\u4E0B\u53E5\u5B50\u4E2D\u7684\u542B\u4E49\uFF1A
+    const prompt = `\u8BF7\u5206\u6790\u82F1\u6587\u5355\u8BCD"${word}"\u5728\u4EE5\u4E0B\u53E5\u5B50\u4E2D\u7684\u542B\u4E49\uFF0C\u5E76\u63D0\u53D6\u5176\u539F\u578B\u5F62\u5F0F\uFF1A
 
 \u53E5\u5B50\uFF1A${context}
 
 \u8BF7\u6309\u4EE5\u4E0BJSON\u683C\u5F0F\u56DE\u590D\uFF1A
 {
+    "base_form": "\u8BE5\u5355\u8BCD\u7684\u539F\u578B/\u57FA\u672C\u5F62\u5F0F\uFF08\u5982\u679C\u662F\u52A8\u8BCD\u5219\u4E3A\u539F\u5F62\uFF0C\u5982\u679C\u662F\u540D\u8BCD\u5219\u4E3A\u5355\u6570\u5F62\u5F0F\u7B49\uFF09",
     "meaning": "\u8BE5\u5355\u8BCD\u5728\u6B64\u53E5\u5B50\u4E2D\u7684\u4E2D\u6587\u542B\u4E49",
     "example": "\u539F\u53E5\u5B50"
 }
 
-\u53EA\u8FD4\u56DEJSON\uFF0C\u4E0D\u8981\u5176\u4ED6\u5185\u5BB9\u3002`;
+\u6CE8\u610F\uFF1A
+- base_form\u5E94\u8BE5\u662F\u5355\u8BCD\u7684\u8BCD\u5178\u5F62\u5F0F\uFF08\u52A8\u8BCD\u539F\u5F62\u3001\u540D\u8BCD\u5355\u6570\u3001\u5F62\u5BB9\u8BCD\u539F\u7EA7\u7B49\uFF09
+- \u5982\u679C\u5355\u8BCD\u672C\u8EAB\u5C31\u662F\u539F\u578B\uFF0C\u5219base_form\u4E0E\u539F\u5355\u8BCD\u76F8\u540C
+- \u53EA\u8FD4\u56DEJSON\uFF0C\u4E0D\u8981\u5176\u4ED6\u5185\u5BB9\u3002`;
     try {
       const response = await this.makeRequest(prompt);
-      return JSON.parse(response);
+      const result = JSON.parse(response);
+      if (!result.base_form) {
+        result.base_form = word;
+      }
+      return result;
     } catch (e) {
       console.error(`\u7FFB\u8BD1\u5355\u8BCD '${word}' \u65F6\u51FA\u9519:`, e);
       return {
+        base_form: word,
         meaning: `\u7FFB\u8BD1\u5931\u8D25: ${word}`,
         example: context
       };
     }
   }
   async translatePhrase(phrase, context) {
-    const prompt = `\u8BF7\u7FFB\u8BD1\u82F1\u6587\u8BCD\u7EC4"${phrase}"\u5728\u4EE5\u4E0B\u53E5\u5B50\u4E2D\u7684\u542B\u4E49\uFF1A
+    const prompt = `\u8BF7\u5206\u6790\u82F1\u6587\u8BCD\u7EC4"${phrase}"\u5728\u4EE5\u4E0B\u53E5\u5B50\u4E2D\u7684\u542B\u4E49\uFF0C\u5E76\u63D0\u53D6\u5176\u539F\u578B\u5F62\u5F0F\uFF1A
 
 \u53E5\u5B50\uFF1A${context}
 
 \u8BF7\u6309\u4EE5\u4E0BJSON\u683C\u5F0F\u56DE\u590D\uFF1A
 {
+    "base_form": "\u8BE5\u8BCD\u7EC4\u7684\u539F\u578B/\u57FA\u672C\u5F62\u5F0F\uFF08\u52A8\u8BCD\u77ED\u8BED\u7528\u539F\u5F62\uFF0C\u53BB\u6389\u65F6\u6001\u53D8\u5316\u7B49\uFF09",
     "meaning": "\u8BE5\u8BCD\u7EC4\u5728\u6B64\u53E5\u5B50\u4E2D\u7684\u4E2D\u6587\u542B\u4E49", 
     "example": "\u539F\u53E5\u5B50"
 }
 
-\u53EA\u8FD4\u56DEJSON\uFF0C\u4E0D\u8981\u5176\u4ED6\u5185\u5BB9\u3002`;
+\u6CE8\u610F\uFF1A
+- base_form\u5E94\u8BE5\u662F\u8BCD\u7EC4\u7684\u57FA\u672C\u5F62\u5F0F\uFF08\u5982\u52A8\u8BCD\u77ED\u8BED\u7684\u539F\u5F62\u3001\u4ECB\u8BCD\u77ED\u8BED\u7684\u57FA\u672C\u5F62\u5F0F\u7B49\uFF09
+- \u5982\u679C\u8BCD\u7EC4\u672C\u8EAB\u5C31\u662F\u539F\u578B\uFF0C\u5219base_form\u4E0E\u539F\u8BCD\u7EC4\u76F8\u540C
+- \u53EA\u8FD4\u56DEJSON\uFF0C\u4E0D\u8981\u5176\u4ED6\u5185\u5BB9\u3002`;
     try {
       const response = await this.makeRequest(prompt);
-      return JSON.parse(response);
+      const result = JSON.parse(response);
+      if (!result.base_form) {
+        result.base_form = phrase;
+      }
+      return result;
     } catch (e) {
       console.error(`\u7FFB\u8BD1\u8BCD\u7EC4 '${phrase}' \u65F6\u51FA\u9519:`, e);
       return {
+        base_form: phrase,
         meaning: `\u7FFB\u8BD1\u5931\u8D25: ${phrase}`,
         example: context
       };
@@ -193,13 +211,19 @@ var AnkiExporter = class {
     this.cards = [];
   }
   addWordCard(word, translation) {
-    const front = word;
-    const back = `${translation.meaning}<br><br>${translation.example}`;
+    const front = translation.base_form;
+    let back = `${translation.meaning}<br><br>${translation.example}`;
+    if (translation.base_form.toLowerCase() !== word.toLowerCase()) {
+      back = `${translation.meaning}<br><br>${translation.example}`;
+    }
     this.cards.push({ front, back });
   }
   addPhraseCard(phrase, translation) {
-    const front = phrase;
-    const back = `${translation.meaning}<br><br>${translation.example}`;
+    const front = translation.base_form;
+    let back = `${translation.meaning}<br><br>${translation.example}`;
+    if (translation.base_form.toLowerCase() !== phrase.toLowerCase()) {
+      back = `${translation.meaning}<br><br>${translation.example}`;
+    }
     this.cards.push({ front, back });
   }
   addSentenceCard(sentence, translation) {
@@ -289,6 +313,7 @@ var MdToAnkiPlugin = class extends import_obsidian.Plugin {
         for (const word of extracted.words) {
           modal.updateProgress(`\u6B63\u5728\u5904\u7406\u751F\u8BCD: ${word.text}`, ++processed, totalItems);
           const translation = await api.translateWord(word.text, word.context);
+          console.log(`[DEBUG] \u751F\u8BCD\u5904\u7406 - \u539F\u6587: "${word.text}", \u539F\u578B: "${translation.base_form}", \u542B\u4E49: "${translation.meaning}"`);
           exporter.addWordCard(word.text, translation);
           await this.sleep(100);
         }
@@ -297,6 +322,7 @@ var MdToAnkiPlugin = class extends import_obsidian.Plugin {
         for (const phrase of extracted.phrases) {
           modal.updateProgress(`\u6B63\u5728\u5904\u7406\u8BCD\u7EC4: ${phrase.text}`, ++processed, totalItems);
           const translation = await api.translatePhrase(phrase.text, phrase.context);
+          console.log(`[DEBUG] \u8BCD\u7EC4\u5904\u7406 - \u539F\u6587: "${phrase.text}", \u539F\u578B: "${translation.base_form}", \u542B\u4E49: "${translation.meaning}"`);
           exporter.addPhraseCard(phrase.text, translation);
           await this.sleep(100);
         }
@@ -396,12 +422,34 @@ var MdToAnkiSettingTab = class extends import_obsidian.PluginSettingTab {
     containerEl.createEl("h3", { text: "\u4F7F\u7528\u8BF4\u660E" });
     const usageEl = containerEl.createEl("div");
     usageEl.createEl("p", { text: "1. \u5728Markdown\u6587\u6863\u4E2D\u4F7F\u7528\u4EE5\u4E0B\u683C\u5F0F\u6807\u8BB0\u5B66\u4E60\u5185\u5BB9\uFF1A" });
-    usageEl.createEl("ul").innerHTML = `
-			<li><strong>**\u5355\u8BCD**</strong> - \u751F\u6210\u751F\u8BCD\u5361\u7247</li>
-			<li><em>*\u8BCD\u7EC4*</em> - \u751F\u6210\u8BCD\u7EC4\u5361\u7247</li>
+    const listEl = containerEl.createEl("ul");
+    listEl.innerHTML = `
+			<li><strong>**\u5355\u8BCD**</strong> - \u751F\u6210\u751F\u8BCD\u5361\u7247\uFF08\u81EA\u52A8\u63D0\u53D6\u539F\u578B\uFF09</li>
+			<li><em>*\u8BCD\u7EC4*</em> - \u751F\u6210\u8BCD\u7EC4\u5361\u7247\uFF08\u81EA\u52A8\u63D0\u53D6\u539F\u578B\uFF09</li>
 			<li><mark>==\u53E5\u5B50==</mark> - \u751F\u6210\u53E5\u5B50\u7FFB\u8BD1\u5361\u7247</li>
 		`;
-    usageEl.createEl("p", { text: '2. \u4F7F\u7528\u547D\u4EE4\u9762\u677F\uFF08Ctrl/Cmd+P\uFF09\u641C\u7D22"\u8F6C\u6362\u5F53\u524D\u6587\u4EF6\u4E3AAnki\u95EA\u5361"\u6216\u4F7F\u7528\u5FEB\u6377\u952E' });
-    usageEl.createEl("p", { text: "3. \u5904\u7406\u5B8C\u6210\u540E\u4F1A\u5728\u6307\u5B9A\u76EE\u5F55\u751F\u6210Anki\u53EF\u5BFC\u5165\u7684txt\u6587\u4EF6" });
+    usageEl.appendChild(listEl);
+    const p2 = document.createElement("p");
+    p2.textContent = '2. \u4F7F\u7528\u547D\u4EE4\u9762\u677F\uFF08Ctrl/Cmd+P\uFF09\u641C\u7D22"\u8F6C\u6362\u5F53\u524D\u6587\u4EF6\u4E3AAnki\u95EA\u5361"\u6216\u4F7F\u7528\u5FEB\u6377\u952E';
+    usageEl.appendChild(p2);
+    const p3 = document.createElement("p");
+    p3.textContent = "3. \u5904\u7406\u5B8C\u6210\u540E\u4F1A\u5728\u6307\u5B9A\u76EE\u5F55\u751F\u6210Anki\u53EF\u5BFC\u5165\u7684txt\u6587\u4EF6";
+    usageEl.appendChild(p3);
+    containerEl.createEl("h3", { text: "\u2728 \u539F\u578B\u63D0\u53D6\u529F\u80FD" });
+    const featureEl = containerEl.createEl("div");
+    const featureP1 = document.createElement("p");
+    featureP1.textContent = "\u63D2\u4EF6\u4F1A\u81EA\u52A8\u8BC6\u522B\u5355\u8BCD\u548C\u8BCD\u7EC4\u7684\u539F\u578B\u5F62\u5F0F\uFF1A";
+    featureEl.appendChild(featureP1);
+    const featureListEl = containerEl.createEl("ul");
+    featureListEl.innerHTML = `
+			<li>\u52A8\u8BCD\u65F6\u6001\uFF1A<code>walked</code> \u2192 <code>walk</code></li>
+			<li>\u540D\u8BCD\u590D\u6570\uFF1A<code>children</code> \u2192 <code>child</code></li>
+			<li>\u5F62\u5BB9\u8BCD\u53D8\u4F4D\uFF1A<code>better</code> \u2192 <code>good</code></li>
+			<li>\u8BCD\u7EC4\u65F6\u6001\uFF1A<code>has been working</code> \u2192 <code>work</code></li>
+		`;
+    featureEl.appendChild(featureListEl);
+    const featureP2 = document.createElement("p");
+    featureP2.textContent = "\u95EA\u5361\u6B63\u9762\u663E\u793A\u539F\u578B\uFF0C\u80CC\u9762\u5305\u542B\u542B\u4E49\u3001\u4F8B\u53E5\u548C\u6587\u4E2D\u53D8\u4F4D\u5F62\u5F0F\uFF08\u5982\u679C\u4E0D\u540C\uFF09\u3002";
+    featureEl.appendChild(featureP2);
   }
 };

@@ -23,6 +23,7 @@ interface ExtractedContent {
 }
 
 interface Translation {
+    base_form: string;
     meaning: string;
     example: string;
 }
@@ -36,24 +37,34 @@ class DeepSeekAPI {
     }
 
     async translateWord(word: string, context: string): Promise<Translation> {
-        const prompt = `请翻译英文单词"${word}"在以下句子中的含义：
+        const prompt = `请分析英文单词"${word}"在以下句子中的含义，并提取其原型形式：
 
 句子：${context}
 
 请按以下JSON格式回复：
 {
+    "base_form": "该单词的原型/基本形式（如果是动词则为原形，如果是名词则为单数形式等）",
     "meaning": "该单词在此句子中的中文含义",
     "example": "原句子"
 }
 
-只返回JSON，不要其他内容。`;
+注意：
+- base_form应该是单词的词典形式（动词原形、名词单数、形容词原级等）
+- 如果单词本身就是原型，则base_form与原单词相同
+- 只返回JSON，不要其他内容。`;
 
         try {
             const response = await this.makeRequest(prompt);
-            return JSON.parse(response);
+            const result = JSON.parse(response);
+            // 确保返回的结果包含base_form字段
+            if (!result.base_form) {
+                result.base_form = word;
+            }
+            return result;
         } catch (e) {
             console.error(`翻译单词 '${word}' 时出错:`, e);
             return {
+                base_form: word,
                 meaning: `翻译失败: ${word}`,
                 example: context
             };
@@ -61,24 +72,34 @@ class DeepSeekAPI {
     }
 
     async translatePhrase(phrase: string, context: string): Promise<Translation> {
-        const prompt = `请翻译英文词组"${phrase}"在以下句子中的含义：
+        const prompt = `请分析英文词组"${phrase}"在以下句子中的含义，并提取其原型形式：
 
 句子：${context}
 
 请按以下JSON格式回复：
 {
+    "base_form": "该词组的原型/基本形式（动词短语用原形，去掉时态变化等）",
     "meaning": "该词组在此句子中的中文含义", 
     "example": "原句子"
 }
 
-只返回JSON，不要其他内容。`;
+注意：
+- base_form应该是词组的基本形式（如动词短语的原形、介词短语的基本形式等）
+- 如果词组本身就是原型，则base_form与原词组相同
+- 只返回JSON，不要其他内容。`;
 
         try {
             const response = await this.makeRequest(prompt);
-            return JSON.parse(response);
+            const result = JSON.parse(response);
+            // 确保返回的结果包含base_form字段
+            if (!result.base_form) {
+                result.base_form = phrase;
+            }
+            return result;
         } catch (e) {
             console.error(`翻译词组 '${phrase}' 时出错:`, e);
             return {
+                base_form: phrase,
                 meaning: `翻译失败: ${phrase}`,
                 example: context
             };
@@ -218,14 +239,26 @@ class AnkiExporter {
     private cards: Array<{ front: string, back: string }> = [];
 
     addWordCard(word: string, translation: Translation) {
-        const front = word;
-        const back = `${translation.meaning}<br><br>${translation.example}`;
+        const front = translation.base_form;
+        let back = `${translation.meaning}<br><br>${translation.example}`;
+
+        // 如果原型与原文不同，在背面添加变位形式的说明
+        if (translation.base_form.toLowerCase() !== word.toLowerCase()) {
+            back = `${translation.meaning}<br><br>${translation.example}`;
+        }
+
         this.cards.push({ front, back });
     }
 
     addPhraseCard(phrase: string, translation: Translation) {
-        const front = phrase;
-        const back = `${translation.meaning}<br><br>${translation.example}`;
+        const front = translation.base_form;
+        let back = `${translation.meaning}<br><br>${translation.example}`;
+
+        // 如果原型与原文不同，在背面添加变位形式的说明
+        if (translation.base_form.toLowerCase() !== phrase.toLowerCase()) {
+            back = `${translation.meaning}<br><br>${translation.example}`;
+        }
+
         this.cards.push({ front, back });
     }
 
@@ -346,6 +379,7 @@ export default class MdToAnkiPlugin extends Plugin {
                 for (const word of extracted.words) {
                     modal.updateProgress(`正在处理生词: ${word.text}`, ++processed, totalItems);
                     const translation = await api.translateWord(word.text, word.context);
+                    console.log(`[DEBUG] 生词处理 - 原文: "${word.text}", 原型: "${translation.base_form}", 含义: "${translation.meaning}"`);
                     exporter.addWordCard(word.text, translation);
 
                     // 添加延迟避免API频率限制
@@ -358,6 +392,7 @@ export default class MdToAnkiPlugin extends Plugin {
                 for (const phrase of extracted.phrases) {
                     modal.updateProgress(`正在处理词组: ${phrase.text}`, ++processed, totalItems);
                     const translation = await api.translatePhrase(phrase.text, phrase.context);
+                    console.log(`[DEBUG] 词组处理 - 原文: "${phrase.text}", 原型: "${translation.base_form}", 含义: "${translation.meaning}"`);
                     exporter.addPhraseCard(phrase.text, translation);
 
                     // 添加延迟避免API频率限制
@@ -533,12 +568,41 @@ class MdToAnkiSettingTab extends PluginSettingTab {
         containerEl.createEl('h3', { text: '使用说明' });
         const usageEl = containerEl.createEl('div');
         usageEl.createEl('p', { text: '1. 在Markdown文档中使用以下格式标记学习内容：' });
-        usageEl.createEl('ul').innerHTML = `
-			<li><strong>**单词**</strong> - 生成生词卡片</li>
-			<li><em>*词组*</em> - 生成词组卡片</li>
+        const listEl = containerEl.createEl('ul');
+        listEl.innerHTML = `
+			<li><strong>**单词**</strong> - 生成生词卡片（自动提取原型）</li>
+			<li><em>*词组*</em> - 生成词组卡片（自动提取原型）</li>
 			<li><mark>==句子==</mark> - 生成句子翻译卡片</li>
 		`;
-        usageEl.createEl('p', { text: '2. 使用命令面板（Ctrl/Cmd+P）搜索"转换当前文件为Anki闪卡"或使用快捷键' });
-        usageEl.createEl('p', { text: '3. 处理完成后会在指定目录生成Anki可导入的txt文件' });
+        usageEl.appendChild(listEl);
+
+        const p2 = document.createElement('p');
+        p2.textContent = '2. 使用命令面板（Ctrl/Cmd+P）搜索"转换当前文件为Anki闪卡"或使用快捷键';
+        usageEl.appendChild(p2);
+
+        const p3 = document.createElement('p');
+        p3.textContent = '3. 处理完成后会在指定目录生成Anki可导入的txt文件';
+        usageEl.appendChild(p3);
+
+        // 新功能说明
+        containerEl.createEl('h3', { text: '✨ 原型提取功能' });
+        const featureEl = containerEl.createEl('div');
+
+        const featureP1 = document.createElement('p');
+        featureP1.textContent = '插件会自动识别单词和词组的原型形式：';
+        featureEl.appendChild(featureP1);
+
+        const featureListEl = containerEl.createEl('ul');
+        featureListEl.innerHTML = `
+			<li>动词时态：<code>walked</code> → <code>walk</code></li>
+			<li>名词复数：<code>children</code> → <code>child</code></li>
+			<li>形容词变位：<code>better</code> → <code>good</code></li>
+			<li>词组时态：<code>has been working</code> → <code>work</code></li>
+		`;
+        featureEl.appendChild(featureListEl);
+
+        const featureP2 = document.createElement('p');
+        featureP2.textContent = '闪卡正面显示原型，背面包含含义、例句和文中变位形式（如果不同）。';
+        featureEl.appendChild(featureP2);
     }
 }
