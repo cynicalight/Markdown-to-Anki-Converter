@@ -1,11 +1,11 @@
 {
-    "id": "Markdown-to-Anki-Converter",
+    "id": "markdown-to-anki-converter",
     "name": "Markdown to Anki Converter",
     "version": "1.0.0",
     "minAppVersion": "0.15.0",
     "description": "Convert the marked content in the Markdown document into Anki flash card.",
     "author": "Jie Zhang",
-    "authorUrl": "https://github.com/cynicalight/Markdown-to-Anki-Converter",
+    "authorUrl": "https://bu44er.ink/",
     "fundingUrl": "",
     "isDesktopOnly": false
 }
