@@ -1,0 +1,11 @@
+{
+    "id": "markdown-to-anki",
+    "name": "Markdown to Anki",
+    "version": "1.0.0",
+    "minAppVersion": "0.15.0",
+    "description": "Convert the marked content in the Markdown document into Anki flash card.",
+    "author": "Jie Zhang",
+    "authorUrl": "https://github.com/cynicalight/markdown-to-anki",
+    "fundingUrl": "",
+    "isDesktopOnly": false
+}

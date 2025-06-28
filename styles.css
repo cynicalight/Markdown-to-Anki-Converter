@@ -1,0 +1,42 @@
+.md-to-anki-progress {
+  text-align: center;
+  padding: 20px;
+}
+
+.md-to-anki-progress h2 {
+  margin-bottom: 15px;
+  color: var(--text-normal);
+}
+
+.progress-container {
+  font-size: 14px;
+  color: var(--text-muted);
+  margin-top: 10px;
+}
+
+.md-to-anki-settings {
+  padding: 20px;
+}
+
+.md-to-anki-settings h3 {
+  margin-top: 30px;
+  margin-bottom: 15px;
+  color: var(--text-normal);
+  border-bottom: 1px solid var(--background-modifier-border);
+  padding-bottom: 5px;
+}
+
+.md-to-anki-usage {
+  background-color: var(--background-secondary);
+  border-radius: 6px;
+  padding: 15px;
+  margin-top: 15px;
+}
+
+.md-to-anki-usage ul {
+  margin-left: 20px;
+}
+
+.md-to-anki-usage li {
+  margin-bottom: 5px;
+}

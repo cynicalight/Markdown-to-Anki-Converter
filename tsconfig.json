@@ -1,0 +1,21 @@
+{
+  "compilerOptions": {
+    "baseUrl": ".",
+    "inlineSourceMap": true,
+    "inlineSources": true,
+    "module": "ESNext",
+    "target": "ES6",
+    "allowJs": true,
+    "noImplicitAny": false,
+    "moduleResolution": "node",
+    "importHelpers": true,
+    "declaration": false,
+    "outDir": "./",
+    "typeRoots": ["node_modules/@types"],
+    "lib": ["DOM", "ES6"],
+    "skipLibCheck": true,
+    "strict": false
+  },
+  "include": ["*.ts", "**/*.ts", "*.d.ts"],
+  "exclude": ["node_modules", "main.js"]
+}
