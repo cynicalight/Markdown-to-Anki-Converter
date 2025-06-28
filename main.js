@@ -194,12 +194,12 @@ var AnkiExporter = class {
   }
   addWordCard(word, translation) {
     const front = word;
-    const back = `${translation.meaning}<br><br><i>${translation.example}</i>`;
+    const back = `${translation.meaning}<br><br>${translation.example}`;
     this.cards.push({ front, back });
   }
   addPhraseCard(phrase, translation) {
     const front = phrase;
-    const back = `${translation.meaning}<br><br><i>${translation.example}</i>`;
+    const back = `${translation.meaning}<br><br>${translation.example}`;
     this.cards.push({ front, back });
   }
   addSentenceCard(sentence, translation) {
